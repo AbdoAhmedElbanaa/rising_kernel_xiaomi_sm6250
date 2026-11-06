@@ -354,11 +354,6 @@ SYSCALL_DEFINE4(fallocate, int, fd, int, mode, loff_t, offset, loff_t, len)
 	return error;
 }
 
-#ifdef CONFIG_KSU
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
-			       int *flags);
-#endif
-
 /*
  * access() needs to use the real uid/gid, not the effective uid/gid.
  * We do this by temporarily clearing all FS-related capabilities and
@@ -375,6 +370,7 @@ SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
 
 #ifdef CONFIG_KSU
+	extern int ksu_handle_faccessat(int *, const char __user **, int *, int *);
 	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
 #endif
 
